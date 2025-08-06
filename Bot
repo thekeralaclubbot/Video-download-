@@ -1,37 +1,25 @@
-from pyrogram import Client, filters
-import yt_dlp
+from flask import Flask, request, send_file, jsonify
+from gtts import gTTS
 import os
+from io import BytesIO
 
-API_ID = gRe_-qfHfb8
-API_HASH = "gRe_-qfHfb8"
-BOT_TOKEN = "8111372305:AAFZ62Tvh1cCsjTrTNbRPqPjFGStdKXNMv0"  # from @BotFather
+app = Flask(__name__)
 
-app = Client("@YtvideodownloaderindiaBOT", gRe_-qfHfb8,gRe_-qfHfb8, 8111372305:AAFZ62Tvh1cCsjTrTNbRPqPjFGStdKXNMv0)
+@app.route('/convert', methods=['POST'])
+def convert_text():
+    data = request.get_json()
+    text = data.get("text", "")
+    lang = data.get("lang", "en")
 
-@app.on_message(filters.private & filters.command("start"))
-async def start(client, message):
-    await message.reply("👋 Send me a YouTube video link, and I'll download it for you!")
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
 
-@app.on_message(filters.private & filters.text & ~filters.command("start"))
-async def download_video(client, message):
-    url = message.text.strip()
-    await message.reply("📥 Downloading video... Please wait...")
+    tts = gTTS(text, lang=lang)
+    mp3_fp = BytesIO()
+    tts.write_to_fp(mp3_fp)
+    mp3_fp.seek(0)
 
-    try:
-        ydl_opts = {
-            'outtmpl': '%(title)s.%(ext)s',
-            'format': 'bestvideo[filesize<2000000000]+bestaudio/best',
-            'merge_output_format': 'mp4',
-        }
+    return send_file(mp3_fp, mimetype='audio/mpeg', as_attachment=True, download_name="speech.mp3")
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            filename = ydl.prepare_filename(info).replace(".webm", ".mp4").replace(".mkv", ".mp4")
-
-        await message.reply_video(video=filename, caption=f"✅ Downloaded: {info['title']}")
-        os.remove(filename)
-
-    except Exception as e:
-        await message.reply(f"❌ Error:\n{str(e)}")
-
-app.run()
+if __name__ == '__main__':
+    app.run(debug=True)
