@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Text to MP3 - FLY MALAPPURAM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    select, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 15px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #111;
+      color: white;
+      text-align: center;
+    }
+
+    footer a {
+      color: #00acee;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Text to MP3 Converter</h1>
+  <p>FLY MALAPPURAM</p>
+</header>
+
+<div class="container">
+  <h3>Enter your text:</h3>
+  <textarea id="text" placeholder="Type your text here..."></textarea>
+
+  <h3>Select Language:</h3>
+  <select id="language">
+    <option value="en">English</option>
+    <option value="ml">Malayalam</option>
+    <option value="hi">Hindi</option>
+    <option value="ta">Tamil</option>
+    <option value="ar">Arabic</option>
+    <option value="fr">French</option>
+    <option value="es">Spanish</option>
+    <option value="de">German</option>
+    <!-- Add more languages as needed -->
+  </select>
+
+  <br><br>
+  <button onclick="convert()">🔊 Convert to MP3</button>
+  <a id="download" style="display:none;" class="btn" download="speech.mp3">⬇️ Download MP3</a>
+</div>
+
+<footer>
+  Follow us on Instagram: 
+  <a href="https://www.instagram.com/flymalappuram?igsh=ZGtjaTdxYTJkMzNp" target="_blank">
+    @flymalappuram
+  </a>
+</footer>
+
+<script>
+  function convert() {
+    const text = document.getElementById("text").value;
+    const lang = document.getElementById("language").value;
+
+    if (!text.trim()) {
+      alert("Please enter text!");
+      return;
+    }
+
+    fetch('/convert', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: text, lang: lang })
+    })
+    .then(res => res.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const download = document.getElementById("download");
+      download.href = url;
+      download.style.display = "inline-block";
+    })
+    .catch(err => alert("Error: " + err));
+  }
+</script>
+
+</body>
+</html>
